@@ -34,3 +34,21 @@ body {
 .glow {
   text-shadow: 0 0 12px rgba(255,153,0,0.7), 0 0 2px #ff9800;
 }
+
+@keyframes shimmerGlow {
+  0% {
+    text-shadow: 0 0 8px #fbbf24, 0 0 16px #fbbf24, 0 0 32px #fbbf24;
+    filter: brightness(1.1);
+  }
+  50% {
+    text-shadow: 0 0 24px #fbbf24, 0 0 48px #fbbf24, 0 0 96px #fbbf24;
+    filter: brightness(1.3);
+  }
+  100% {
+    text-shadow: 0 0 8px #fbbf24, 0 0 16px #fbbf24, 0 0 32px #fbbf24;
+    filter: brightness(1.1);
+  }
+}
+.shimmer-glow {
+  animation: shimmerGlow 2.5s infinite linear;
+}
