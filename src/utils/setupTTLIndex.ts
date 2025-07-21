@@ -1,4 +1,4 @@
-// Utility script to set up TTL index on expiresAt for burnerLinks collection
+// Utility script to set up TTL index on expiresAt for burner-links collection
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import dotenv from 'dotenv';
 import { setupTTLIndex } from '@/utils/mongoUtils';
@@ -17,7 +17,7 @@ async function setupTTL() {
   });
   await client.connect();
   const db = client.db();
-  await db.collection('burnerLinks').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection('burner-links').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
   console.log('TTL index created on expiresAt');
   await client.close();
 }

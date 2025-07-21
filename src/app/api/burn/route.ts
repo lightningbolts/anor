@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const collection = await getCollection(process.env.MONGODB_COLLECTION_NAME || 'burnerLinks');
+    const collection = await getCollection('burner-links');
     await collection.insertOne(doc);
     return NextResponse.json({ url: `https://anor.vercel.app/b/${id}` });
   } catch (err) {

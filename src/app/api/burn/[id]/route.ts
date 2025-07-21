@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const password = req.nextUrl.searchParams.get('password');
 
   try {
-    const collection = await getCollection(process.env.MONGODB_COLLECTION_NAME || 'burnerLinks');
+    const collection = await getCollection('burner-links');
     const link = await collection.findOne({ id });
     if (!link) {
       return NextResponse.json({ error: 'Link not found or burned' }, { status: 404 });
