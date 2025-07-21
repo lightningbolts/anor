@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { emberGlow } from "@/utils/styles";
 
 export default function BurnForm() {
@@ -12,6 +12,8 @@ export default function BurnForm() {
   const [loading, setLoading] = useState(false);
   const [burnerUrl, setBurnerUrl] = useState("");
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,9 +151,21 @@ export default function BurnForm() {
           <button
             type="button"
             className="ml-4 px-3 py-1 bg-orange-600 rounded text-white"
-            onClick={() => navigator.clipboard.writeText(burnerUrl)}
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(burnerUrl);
+                setCopied(true);
+                if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+                copyTimeoutRef.current = setTimeout(() => {
+                  setCopied(false);
+                  copyTimeoutRef.current = null;
+                }, 1500);
+              } catch {
+                // Optionally handle error
+              }
+            }}
           >
-            Copy
+            {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
       )}

@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
       }
     }
     // Burn after read or maxViews logic
-    let burned = false;
     let update: any = {};
     // If burnAfterRead is enabled and link has already been accessed, burn it
     if (link.burnAfterRead && link.accessed) {
@@ -33,7 +32,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'This link has been burned.', burned: true }, { status: 410 });
     }
     // If maxViews is reached, burn it
-    if (link.maxViews && link.clicks + 1 > link.maxViews) {
+    if (link.maxViews && link.clicks >= link.maxViews) {
       await collection.deleteOne({ id });
       return NextResponse.json({ error: 'Link burned after max views', burned: true }, { status: 410 });
     }

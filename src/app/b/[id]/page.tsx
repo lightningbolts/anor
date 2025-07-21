@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { emberGlow } from '@/utils/styles';
 
@@ -12,7 +12,10 @@ export default function BurnerLinkPage() {
   const [password, setPassword] = useState('');
   const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [passwordError, setPasswordError] = useState('');
   const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -22,6 +25,7 @@ export default function BurnerLinkPage() {
   const fetchData = async (pw?: string) => {
     setLoading(true);
     setError('');
+    if (pw) setPasswordError('');
     let url = `/api/burn/${id}`;
     if (pw) url += `?password=${encodeURIComponent(pw)}`;
     try {
@@ -30,6 +34,7 @@ export default function BurnerLinkPage() {
       if (res.status === 401) {
         setShowPasswordPrompt(true);
         setLoading(false);
+        if (pw) setPasswordError('Incorrect password entered.');
         return;
       }
       if (!res.ok) {
@@ -71,6 +76,26 @@ export default function BurnerLinkPage() {
     fetchData(password);
   };
 
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => {
+        setCopied(false);
+        copyTimeoutRef.current = null;
+      }, 1500);
+    } catch {
+      // Optionally handle error
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    };
+  }, []);
+
   if (loading) return <div className={`p-8 rounded-xl ${emberGlow} max-w-lg mx-auto mt-20 text-white text-center`}>Loading...</div>;
   if (error) return <div className={`p-8 rounded-xl ${emberGlow} max-w-lg mx-auto mt-20 text-red-400 text-center font-bold`}>{error}</div>;
 
@@ -79,7 +104,14 @@ export default function BurnerLinkPage() {
       {showPasswordPrompt ? (
         <form onSubmit={handlePasswordSubmit} className="mb-6">
           <label className="block text-white mb-2">Password Required</label>
-          <input type="password" className="w-full p-2 rounded bg-black bg-opacity-40 text-white mb-2" value={password} onChange={e => setPassword(e.target.value)} />
+          <input
+            ref={passwordInputRef}
+            type="password"
+            className="w-full p-2 rounded bg-black bg-opacity-40 text-white mb-2"
+            value={password}
+            onChange={e => { setPassword(e.target.value); setPasswordError(''); }}
+          />
+          {passwordError && <div className="text-black mb-2 font-bold">{passwordError}</div>}
           <button type="submit" className="w-full py-2 rounded bg-yellow-500 text-black font-bold">Unlock</button>
         </form>
       ) : null}
@@ -93,7 +125,13 @@ export default function BurnerLinkPage() {
         <div className="mb-4 border-2 border-orange-500 bg-black bg-opacity-40 p-4 rounded shadow-lg">
           <span className="block text-orange-300 font-bold mb-2">Redirect Link:</span>
           <a href={data.targetUrl} className="font-mono text-lg underline break-all text-white" target="_blank" rel="noopener noreferrer">{data.targetUrl}</a>
-          <button type="button" className="ml-4 px-3 py-1 bg-orange-600 rounded text-white" onClick={() => {navigator.clipboard.writeText(data.targetUrl);setCopied(true);setTimeout(()=>setCopied(false),1500);}}>{copied ? 'Copied!' : 'Copy'}</button>
+          <button
+            type="button"
+            className="ml-4 px-3 py-1 bg-orange-600 rounded text-white"
+            onClick={() => handleCopy(data.targetUrl)}
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
         </div>
       )}
       {countdown !== null && (
