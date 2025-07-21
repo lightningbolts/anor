@@ -27,22 +27,28 @@ export async function GET(req: NextRequest) {
     // Burn after read or maxViews logic
     let burned = false;
     let update: any = {};
+    // If burnAfterRead is enabled and link has already been accessed, burn it
+    if (link.burnAfterRead && link.accessed) {
+      await collection.deleteOne({ id });
+      return NextResponse.json({ error: 'This link has been burned.', burned: true }, { status: 410 });
+    }
+    // If maxViews is reached, burn it
+    if (link.maxViews && link.clicks + 1 > link.maxViews) {
+      await collection.deleteOne({ id });
+      return NextResponse.json({ error: 'Link burned after max views', burned: true }, { status: 410 });
+    }
+    // On first access, update accessed and clicks, but do NOT mark as burned
     if (link.burnAfterRead && !link.accessed) {
       update.accessed = true;
-      burned = true;
-    }
-    if (link.maxViews && link.clicks + 1 >= link.maxViews) {
-      await collection.deleteOne({ id });
-      return NextResponse.json({ error: 'Link burned after max views' }, { status: 410 });
     }
     update.clicks = (link.clicks || 0) + 1;
     update.lastAccessedAt = now;
     await collection.updateOne({ id }, { $set: update });
     // Message-only or redirect
     if (link.message) {
-      return NextResponse.json({ message: link.message, burned, clicks: update.clicks, maxViews: link.maxViews, analyticsEnabled: link.analyticsEnabled, expiresAt: link.expiresAt });
+      return NextResponse.json({ message: link.message, burned: false, clicks: update.clicks, maxViews: link.maxViews, analyticsEnabled: link.analyticsEnabled, expiresAt: link.expiresAt });
     } else if (link.targetUrl) {
-      return NextResponse.json({ targetUrl: link.targetUrl, burned, clicks: update.clicks, maxViews: link.maxViews, analyticsEnabled: link.analyticsEnabled, expiresAt: link.expiresAt });
+      return NextResponse.json({ targetUrl: link.targetUrl, burned: false, clicks: update.clicks, maxViews: link.maxViews, analyticsEnabled: link.analyticsEnabled, expiresAt: link.expiresAt });
     } else {
       return NextResponse.json({ error: 'Invalid link type' }, { status: 400 });
     }
