@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Anor Burner Link System
+
+A modern burner link system built with Next.js App Router, TypeScript, MongoDB (native driver), and Tailwind CSS.
+
+## Features
+- Create burner links for URLs or messages
+- Optional password protection (bcryptjs)
+- Burn after read, after X seconds, or after X views
+- TTL auto-deletion of expired links (MongoDB)
+- Glowing ember UI aesthetic (Tailwind CSS)
+- Copy-to-clipboard, countdown timer, and toasts
+- Analytics: access count (optional)
+- Message-only and redirect link support
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+2. **Set up environment:**
+   - Add your MongoDB URI to `.env` as `MONGODB_URI`
+3. **Set up MongoDB TTL index:**
+   ```bash
+   npm run setup:ttl
+   # or run src/utils/setupTTLIndex.ts manually
+   ```
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+5. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Usage
+- Use the burner link form to create a new link.
+- Share the generated burner URL.
+- Access the burner link to view the message or redirect.
+- Links expire and burn based on your settings.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
+- `src/app/api/burn/route.ts` — POST API to create burner links
+- `src/app/api/burn/[id]/route.ts` — GET API to access burner links
+- `src/app/b/[id]/page.tsx` — Burner link page UI
+- `src/components/BurnForm.tsx` — Burner link creation form
+- `src/utils/mongoClient.ts` — MongoDB connection utility
+- `src/utils/styles.ts` — Shared Tailwind style constants
+- `src/utils/setupTTLIndex.ts` — TTL index setup script
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
+Deploy easily on [Vercel](https://vercel.com/). See Next.js docs for details.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+MIT
