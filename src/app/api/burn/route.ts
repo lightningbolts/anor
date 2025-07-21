@@ -37,10 +37,11 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const collection = await getCollection('burner-links');
+    const collection = await getCollection(process.env.MONGODB_COLLECTION_NAME || 'burnerLinks');
     await collection.insertOne(doc);
     return NextResponse.json({ url: `https://anor.vercel.app/b/${id}` });
-  } catch (err) {
-    return NextResponse.json({ error: 'Database error', details: err }, { status: 500 });
+  } catch (err: any) {
+    console.error('API /api/burn error:', err);
+    return NextResponse.json({ error: 'Database error', details: err?.message || err }, { status: 500 });
   }
 }
