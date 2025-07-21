@@ -39,7 +39,12 @@ export async function POST(req: NextRequest) {
   try {
     const collection = await getCollection(process.env.MONGODB_COLLECTION_NAME || 'burnerLinks');
     await collection.insertOne(doc);
-    return NextResponse.json({ url: `https://anor.vercel.app/b/${id}` });
+    // Dynamically get protocol and host from request headers
+    const headers = req.headers;
+    const protocol = headers.get('x-forwarded-proto') || 'https';
+    const host = headers.get('x-forwarded-host') || headers.get('host');
+    const url = `${protocol}://${host}/b/${id}`;
+    return NextResponse.json({ url });
   } catch (err: any) {
     console.error('API /api/burn error:', err);
     return NextResponse.json({ error: 'Database error', details: err?.message || err }, { status: 500 });
