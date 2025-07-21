@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 const emberGlow = 'bg-gradient-to-r from-orange-500 via-red-600 to-yellow-400 shadow-[0_0_40px_10px_rgba(255,100,0,0.5)] animate-pulse';
 
 export default function BurnerLinkPage() {
   const { id } = useParams();
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState('');
