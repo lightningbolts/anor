@@ -31,26 +31,34 @@ export async function GET(req: NextRequest) {
       await collection.deleteOne({ id });
       return NextResponse.json({ error: 'This link has been burned.', burned: true }, { status: 410 });
     }
-    // If maxViews is reached, burn it
-    if (link.maxViews && link.clicks >= link.maxViews) {
-      await collection.deleteOne({ id });
-      return NextResponse.json({ error: 'Link burned after max views', burned: true }, { status: 410 });
-    }
-    // On first access, update accessed and clicks, but do NOT mark as burned
+    // On first access, update accessed and clicks
     if (link.burnAfterRead && !link.accessed) {
       update.accessed = true;
     }
     update.clicks = (link.clicks || 0) + 1;
     update.lastAccessedAt = now;
     await collection.updateOne({ id }, { $set: update });
-    // Message-only or redirect
-    if (link.message) {
-      return NextResponse.json({ message: link.message, burned: false, clicks: update.clicks, maxViews: link.maxViews, analyticsEnabled: link.analyticsEnabled, expiresAt: link.expiresAt });
-    } else if (link.targetUrl) {
-      return NextResponse.json({ targetUrl: link.targetUrl, burned: false, clicks: update.clicks, maxViews: link.maxViews, analyticsEnabled: link.analyticsEnabled, expiresAt: link.expiresAt });
-    } else {
-      return NextResponse.json({ error: 'Invalid link type' }, { status: 400 });
+
+    // Fetch updated link to check if it should now be burned AFTER serving content
+    const updatedLink = await collection.findOne({ id });
+    let shouldBurnAfterResponse = false;
+    if (updatedLink && updatedLink.maxViews && updatedLink.clicks === updatedLink.maxViews) {
+      shouldBurnAfterResponse = true;
     }
+    // Message-only or redirect
+    let response;
+    if (updatedLink && updatedLink.message) {
+      response = NextResponse.json({ message: updatedLink.message, burned: false, clicks: updatedLink.clicks, maxViews: updatedLink.maxViews, analyticsEnabled: updatedLink.analyticsEnabled, expiresAt: updatedLink.expiresAt });
+    } else if (updatedLink && updatedLink.targetUrl) {
+      response = NextResponse.json({ targetUrl: updatedLink.targetUrl, burned: false, clicks: updatedLink.clicks, maxViews: updatedLink.maxViews, analyticsEnabled: updatedLink.analyticsEnabled, expiresAt: updatedLink.expiresAt });
+    } else {
+      response = NextResponse.json({ error: 'Invalid link type' }, { status: 400 });
+    }
+    if (shouldBurnAfterResponse) {
+      // Burn the link after serving the content
+      await collection.deleteOne({ id });
+    }
+    return response;
   } catch (err) {
     return NextResponse.json({ error: 'Database error', details: err }, { status: 500 });
   }

@@ -30,7 +30,6 @@ export default function BurnForm() {
           password: password || undefined,
           burnAfterSeconds,
           burnAfterRead,
-          maxViews: maxViews === "" ? undefined : maxViews,
           analyticsEnabled,
         }),
       });
@@ -108,6 +107,8 @@ export default function BurnForm() {
       <div className="mb-4">
         <span className="text-yellow-300">Tip: Fill either Target URL or Message. If both are filled, Message will be shown instead of redirect.</span>
       </div>
+      {/* Max Views (disabled) */}
+      {/*
       <div className="mb-4">
         <label className="block text-white mb-2">Max Views (optional)</label>
         <input
@@ -122,6 +123,7 @@ export default function BurnForm() {
         />
         <span className="text-orange-300 text-xs">Link will burn after this many accesses.</span>
       </div>
+      */}
       <div className="mb-4 flex items-center">
         <input
           type="checkbox"
@@ -131,6 +133,9 @@ export default function BurnForm() {
         />
         <span className="text-white">Show Access Count (analytics)</span>
       </div>
+      {error && (
+        <div className="mt-2 text-black font-bold p-2 text-left">{error}</div>
+      )}
       <button
         type="submit"
         className="w-full py-3 rounded bg-yellow-500 text-black font-bold text-xl shadow-lg hover:bg-orange-600 transition"
@@ -168,9 +173,6 @@ export default function BurnForm() {
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
-      )}
-      {error && (
-        <div className="mt-4 text-red-400 font-bold">{error}</div>
       )}
     </form>
   );

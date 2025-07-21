@@ -19,7 +19,6 @@ export default function BurnerLinkPage() {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchData = async (pw?: string) => {
@@ -111,7 +110,7 @@ export default function BurnerLinkPage() {
             value={password}
             onChange={e => { setPassword(e.target.value); setPasswordError(''); }}
           />
-          {passwordError && <div className="text-black mb-2 font-bold">{passwordError}</div>}
+          {passwordError && <div className="text-black mb-2 font-bold p-2 text-left">{passwordError}</div>}
           <button type="submit" className="w-full py-2 rounded bg-yellow-500 text-black font-bold">Unlock</button>
         </form>
       ) : null}

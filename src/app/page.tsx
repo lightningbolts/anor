@@ -45,7 +45,9 @@ export default function Home() {
         <header className="text-center">
           <Heading>Anor</Heading>
           <p className="text-lg sm:text-xl text-gray-300 font-ui font-medium">
-            A flame that consumes its links. <span className="text-amber-400">Burn after reading.</span>
+            A flame that consumes its links.
+            <br />
+            <span className="text-amber-400">Burn after reading.</span>
           </p>
         </header>
         {/* Form */}
