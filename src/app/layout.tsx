@@ -40,12 +40,12 @@ export default function RootLayout({
           ${cinzel.variable} 
           ${inter.variable} 
           ${jetbrainsMono.variable} 
-          antialiased
+          h-full bg-gradient-to-br from-black via-gray-900 to-gray-800
         `}
       >
         {children}
+        <Analytics />
       </body>
-      <Analytics />
     </html>
   );
 }

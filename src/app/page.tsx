@@ -37,13 +37,10 @@ export default function Home() {
   return (
     <div
       className="min-h-screen flex flex-col justify-center items-center px-4"
-      style={{
-        background: "linear-gradient(135deg, #000 0%, #232323 100%)",
-      }}
     >
       <main className="w-full max-w-md mx-auto flex flex-col items-center gap-8">
         {/* Title & Description */}
-        <header className="text-center">
+        <header className="text-center mt-12">
           <Heading>
             <span className="inline-block animate-fade-in-up text-4xl sm:text-5xl font-bold tracking-tight text-amber-400 drop-shadow-lg relative shimmer-glow">
               Anor
