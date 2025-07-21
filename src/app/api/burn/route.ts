@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/utils/mongoClient';
+import { getCollection } from '@/utils/mongoUtils';
 import bcrypt from 'bcryptjs';
 import { customAlphabet } from 'nanoid';
 
@@ -37,9 +37,8 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const client = await clientPromise;
-    const db = client.db();
-    await db.collection('burnerLinks').insertOne(doc);
+    const collection = await getCollection(process.env.MONGODB_COLLECTION_NAME || 'burnerLinks');
+    await collection.insertOne(doc);
     return NextResponse.json({ url: `https://anor.vercel.app/b/${id}` });
   } catch (err) {
     return NextResponse.json({ error: 'Database error', details: err }, { status: 500 });

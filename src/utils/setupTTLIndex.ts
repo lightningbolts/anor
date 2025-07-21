@@ -1,6 +1,7 @@
 // Utility script to set up TTL index on expiresAt for burnerLinks collection
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import dotenv from 'dotenv';
+import { setupTTLIndex } from '@/utils/mongoUtils';
 dotenv.config({ path: '../../.env' });
 
 const uri = process.env.MONGODB_URI;
@@ -21,4 +22,4 @@ async function setupTTL() {
   await client.close();
 }
 
-setupTTL().catch(console.error);
+setupTTLIndex().catch(console.error);

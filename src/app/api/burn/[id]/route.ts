@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/utils/mongoClient';
+import { getCollection } from '@/utils/mongoUtils';
 import bcrypt from 'bcryptjs';
 
 export async function GET(req: NextRequest) {
@@ -9,15 +9,14 @@ export async function GET(req: NextRequest) {
   const password = req.nextUrl.searchParams.get('password');
 
   try {
-    const client = await clientPromise;
-    const db = client.db();
-    const link = await db.collection('burnerLinks').findOne({ id });
+    const collection = await getCollection(process.env.MONGODB_COLLECTION_NAME || 'burnerLinks');
+    const link = await collection.findOne({ id });
     if (!link) {
       return NextResponse.json({ error: 'Link not found or burned' }, { status: 404 });
     }
     const now = new Date();
     if (link.expiresAt && now > new Date(link.expiresAt)) {
-      await db.collection('burnerLinks').deleteOne({ id });
+      await collection.deleteOne({ id });
       return NextResponse.json({ error: 'Link expired and burned' }, { status: 410 });
     }
     if (link.passwordHash) {
@@ -33,12 +32,12 @@ export async function GET(req: NextRequest) {
       burned = true;
     }
     if (link.maxViews && link.clicks + 1 >= link.maxViews) {
-      await db.collection('burnerLinks').deleteOne({ id });
+      await collection.deleteOne({ id });
       return NextResponse.json({ error: 'Link burned after max views' }, { status: 410 });
     }
     update.clicks = (link.clicks || 0) + 1;
     update.lastAccessedAt = now;
-    await db.collection('burnerLinks').updateOne({ id }, { $set: update });
+    await collection.updateOne({ id }, { $set: update });
     // Message-only or redirect
     if (link.message) {
       return NextResponse.json({ message: link.message, burned, clicks: update.clicks, maxViews: link.maxViews, analyticsEnabled: link.analyticsEnabled, expiresAt: link.expiresAt });
