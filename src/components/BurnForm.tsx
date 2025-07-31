@@ -24,8 +24,10 @@ export default function BurnForm() {
     try {
       // E2EE: generate a random password if not provided
       let userPassword = password;
+      let passwordWasRandom = false;
       if (!userPassword) {
         userPassword = encodeBase64(randomSalt(16));
+        passwordWasRandom = true;
       }
       const salt = randomSalt(16);
       const key = await generateKeyFromPassword(userPassword, salt);
@@ -60,9 +62,14 @@ export default function BurnForm() {
       });
       const data = await res.json();
       if (res.ok && data.url) {
-        setBurnerUrl(data.url);
-        // Show password to user if generated
-        if (!password) {
+        let fullUrl = data.url;
+        if (passwordWasRandom) {
+          // Attach password as fragment for sharing
+          fullUrl = `${data.url}#password=${encodeURIComponent(userPassword)}`;
+        }
+        setBurnerUrl(fullUrl);
+        // Only set password in state if user supplied it
+        if (!passwordWasRandom && password) {
           setPassword(userPassword);
         }
       } else {
@@ -204,13 +211,14 @@ export default function BurnForm() {
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>
-          {password && (
-            <div className="mt-4 p-3 rounded bg-yellow-900 bg-opacity-60 text-yellow-200 text-sm">
-              <span className="block font-bold mb-1">Password:</span>
-              <span className="font-mono break-all">{password}</span>
-              <div className="mt-2 text-yellow-400">Share this password securely with the recipient. <b>Do not send it in the same channel as the link.</b></div>
-            </div>
-          )}
+      {/* Only show password if user supplied it */}
+      {password && (
+        <div className="mt-4 p-3 rounded bg-yellow-900 bg-opacity-60 text-yellow-200 text-sm">
+          <span className="block font-bold mb-1">Password:</span>
+          <span className="font-mono break-all">{password}</span>
+          <div className="mt-2 text-yellow-400">Share this password securely with the recipient.</div>
+        </div>
+      )}
         </div>
       )}
     </form>

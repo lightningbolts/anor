@@ -19,6 +19,8 @@ export default function BurnerLinkPage() {
   const [copied, setCopied] = useState(false);
   const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
+  // Extract password from fragment if present
+  const [autoPasswordTried, setAutoPasswordTried] = useState(false);
 
   useEffect(() => {
     const fetchEncrypted = async () => {
@@ -50,6 +52,45 @@ export default function BurnerLinkPage() {
     };
     fetchEncrypted();
   }, [id]);
+
+  // Auto-submit password from fragment if present
+  useEffect(() => {
+    if (!data || !showPasswordPrompt || autoPasswordTried) return;
+    // Only run once per data load
+    setAutoPasswordTried(true);
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hash = window.location.hash.substring(1); // remove '#'
+      // Support both 'password=...' and just the password
+      let pwd = '';
+      if (hash.startsWith('password=')) {
+        pwd = decodeURIComponent(hash.replace('password=', ''));
+      } else {
+        pwd = decodeURIComponent(hash);
+      }
+      if (pwd) {
+        // Try to auto-decrypt
+        (async () => {
+          try {
+            const salt = decodeBase64(data.salt);
+            const key = await generateKeyFromPassword(pwd, salt);
+            let decryptedMessage = undefined;
+            let decryptedUrl = undefined;
+            if (data.message && data.ivMsg) {
+              decryptedMessage = await decryptString(data.message, data.ivMsg, key);
+            }
+            if (data.targetUrl && data.ivUrl) {
+              decryptedUrl = await decryptString(data.targetUrl, data.ivUrl, key);
+            }
+            setData({ ...data, message: decryptedMessage, targetUrl: decryptedUrl });
+            setShowPasswordPrompt(false);
+            setPassword('');
+          } catch {
+            // If auto-decrypt fails, just show prompt as normal
+          }
+        })();
+      }
+    }
+  }, [data, showPasswordPrompt, autoPasswordTried]);
 
   useEffect(() => {
     if (countdown === null) return;
