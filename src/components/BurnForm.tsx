@@ -133,6 +133,11 @@ export default function BurnForm() {
         />
         <span className="text-white">Burn After Read</span>
       </div>
+      {burnAfterRead && (
+        <div className="mb-2 text-black text-xs font-bold">
+          Note: When Burn After Read is enabled, Max Views is ignored and the link will burn after the first access.
+        </div>
+      )}
       <div className="mb-4">
         <span className="text-yellow-300">Tip: Fill either Target URL or Message. If both are filled, Message will be shown instead of redirect.</span>
       </div>
@@ -147,6 +152,7 @@ export default function BurnForm() {
             setMaxViews(e.target.value === "" ? "" : Number(e.target.value))
           }
           placeholder="Burn after X views"
+          disabled={burnAfterRead}
         />
         <span className="text-orange-300 text-xs">Link will burn after this many accesses.</span>
       </div>
