@@ -3,12 +3,11 @@ import { Cinzel, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
 
-// Import fonts and set CSS variables
 const cinzel = Cinzel({
   variable: "--font-cinzel",
   subsets: ["latin"],
   display: "swap",
-  weight: ["700", "900"], // Bold for headings
+  weight: ["700", "900"],
 });
 
 const inter = Inter({
