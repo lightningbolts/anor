@@ -37,9 +37,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning={true} className="h-full">
       <body
         className={`
-          ${cinzel.variable} 
-          ${inter.variable} 
-          ${jetbrainsMono.variable} 
+          font-sans
+          ${cinzel.variable}
+          ${inter.variable}
+          ${jetbrainsMono.variable}
           h-full bg-gradient-to-br from-black via-gray-900 to-gray-800
         `}
       >

@@ -38,6 +38,13 @@ export default function FAQ() {
         <h3 className="font-bold text-lg mb-1">Can I create multiple burner links?</h3>
         <p className="text-gray-200">Absolutely! You can create as many burner links as you need, each with its own settings and expiration.</p>
       </div>
+      <div className="mb-4">
+        <h3 className="font-bold text-lg mb-1">Do I need an account?</h3>
+        <p className="text-gray-200">No account is required to create a burner link. Simply enter the target URL, optional message, password, and burn settings in the form on the homepage. Click "Create Burner Link" to generate your link.</p>
+      </div>
+      <div className="mb-4">
+        <h3 className="font-bold text-lg mb-1">Enjoy wielding your Anor links responsibly!</h3>
+      </div>
     </section>
   );
 }

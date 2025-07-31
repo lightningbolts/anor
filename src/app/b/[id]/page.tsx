@@ -102,7 +102,7 @@ export default function BurnerLinkPage() {
         <div className="max-w-lg mx-auto mt-10 mb-2 text-center">
           <a href="/" className="inline-block px-4 py-2 rounded bg-yellow-500 text-black font-bold shadow hover:bg-yellow-400 transition-colors duration-150">Create your own burner link.</a>
         </div>
-        <div className={`p-8 rounded-xl ${emberGlow} max-w-lg mx-auto mt-20 text-red-400 text-center font-bold`}>
+        <div className={`p-8 rounded-xl ${emberGlow} max-w-lg mx-auto mt-20 text-white-600 text-center font-bold`}>
           {burnedMaxViews
             ? 'This link has been burned (maximum views reached).'
             : error}
@@ -194,7 +194,7 @@ export default function BurnerLinkPage() {
         {data?.clicks !== undefined && data?.analyticsEnabled && (
           <div className="mb-2 text-white">Accesses: <span className="font-mono">{data.clicks}</span></div>
         )}
-        {data?.burned && <div className="mt-4 text-red-400 font-bold">This link has been burned.</div>}
+        {data?.burned && <div className="mt-4 text-white-400 font-bold">This link has been burned.</div>}
       </div>
 
       <Footer />

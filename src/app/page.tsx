@@ -42,8 +42,11 @@ export default function Home() {
       <main className="w-full max-w-md mx-auto flex flex-col items-center gap-8">
         <header className="text-center mt-12">
           <Heading>
-            <span className="inline-block animate-fade-in-up text-4xl sm:text-5xl font-bold tracking-tight text-amber-400 drop-shadow-lg relative shimmer-glow">
-              Anor
+            <span
+              className="inline-block animate-fade-in-up tracking-tight text-amber-400 drop-shadow-lg relative shimmer-glow"
+              style={{ fontFamily: 'inherit' }}
+            >
+              ANOR
             </span>
           </Heading>
           <p className="text-lg sm:text-xl text-gray-300 font-ui font-medium animate-fade-in-up delay-150">
