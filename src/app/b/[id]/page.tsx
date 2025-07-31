@@ -93,12 +93,20 @@ export default function BurnerLinkPage() {
     );
   }
   if (error) {
+    let burnedMaxViews = false;
+    if (data?.burnedReason === 'maxViews' || error.toLowerCase().includes('max views')) {
+      burnedMaxViews = true;
+    }
     return (
       <>
-      <div className="max-w-lg mx-auto mt-10 mb-2 text-center">
-        <a href="/" className="inline-block px-4 py-2 rounded bg-yellow-500 text-black font-bold shadow hover:bg-yellow-400 transition-colors duration-150">Create your own burner link.</a>
-      </div>
-        <div className={`p-8 rounded-xl ${emberGlow} max-w-lg mx-auto mt-20 text-red-400 text-center font-bold`}>{error}</div>
+        <div className="max-w-lg mx-auto mt-10 mb-2 text-center">
+          <a href="/" className="inline-block px-4 py-2 rounded bg-yellow-500 text-black font-bold shadow hover:bg-yellow-400 transition-colors duration-150">Create your own burner link.</a>
+        </div>
+        <div className={`p-8 rounded-xl ${emberGlow} max-w-lg mx-auto mt-20 text-red-400 text-center font-bold`}>
+          {burnedMaxViews
+            ? 'This link has been burned (maximum views reached).'
+            : error}
+        </div>
         <Footer />
       </>
     );

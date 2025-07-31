@@ -54,6 +54,7 @@ export default function BurnForm() {
           salt: encodeBase64(salt),
           burnAfterSeconds,
           burnAfterRead,
+          maxViews: maxViews === "" ? undefined : maxViews,
           analyticsEnabled,
         }),
       });
@@ -135,8 +136,6 @@ export default function BurnForm() {
       <div className="mb-4">
         <span className="text-yellow-300">Tip: Fill either Target URL or Message. If both are filled, Message will be shown instead of redirect.</span>
       </div>
-      {/* Max Views (disabled) */}
-      {/*
       <div className="mb-4">
         <label className="block text-white mb-2">Max Views (optional)</label>
         <input
@@ -151,7 +150,6 @@ export default function BurnForm() {
         />
         <span className="text-orange-300 text-xs">Link will burn after this many accesses.</span>
       </div>
-      */}
       <div className="mb-4 flex items-center">
         <input
           type="checkbox"

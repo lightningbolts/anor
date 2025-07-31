@@ -37,8 +37,10 @@ export async function GET(req: NextRequest) {
     // Fetch updated link to check if it should now be burned AFTER serving content
     const updatedLink = await collection.findOne({ id });
     let shouldBurnAfterResponse = false;
+    let burnedReason = null;
     if (updatedLink && updatedLink.maxViews && updatedLink.clicks === updatedLink.maxViews) {
       shouldBurnAfterResponse = true;
+      burnedReason = 'maxViews';
     }
     // Always return ciphertext, iv, and salt for E2EE
     let response;
@@ -53,7 +55,8 @@ export async function GET(req: NextRequest) {
         clicks: updatedLink.clicks,
         maxViews: updatedLink.maxViews,
         analyticsEnabled: updatedLink.analyticsEnabled,
-        expiresAt: updatedLink.expiresAt
+        expiresAt: updatedLink.expiresAt,
+        burnedReason: null
       });
     } else {
       response = NextResponse.json({ error: 'Invalid link type' }, { status: 400 });
@@ -61,6 +64,14 @@ export async function GET(req: NextRequest) {
     if (shouldBurnAfterResponse) {
       // Burn the link after serving the content
       await collection.deleteOne({ id });
+      // Return a burned response if this was the last allowed view
+      return NextResponse.json({
+        error: 'This link has been burned (max views reached).',
+        burned: true,
+        burnedReason: 'maxViews',
+        clicks: updatedLink.clicks,
+        maxViews: updatedLink.maxViews
+      }, { status: 410 });
     }
     return response;
   } catch (err) {
