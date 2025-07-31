@@ -123,7 +123,7 @@ export default function BurnForm() {
         <input
           type="number"
           min={10}
-          max={86400}
+          max={315360000}
           className="w-full p-2 rounded bg-black bg-opacity-40 text-white"
           value={burnAfterSeconds}
           onChange={(e) =>
