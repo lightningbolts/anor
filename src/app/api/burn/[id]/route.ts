@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCollection } from '@/utils/mongoUtils';
-import bcrypt from 'bcryptjs';
 
 export async function GET(req: NextRequest) {
   // Extract id from the pathname
   const urlParts = req.nextUrl.pathname.split('/');
   const id = urlParts[urlParts.length - 1];
-  const password = req.nextUrl.searchParams.get('password');
+  // No password for E2EE; key is never sent to server
 
   try {
     const collection = await getCollection('burner-links');
@@ -19,11 +18,7 @@ export async function GET(req: NextRequest) {
       await collection.deleteOne({ id });
       return NextResponse.json({ error: 'Link expired and burned' }, { status: 410 });
     }
-    if (link.passwordHash) {
-      if (!password || !(await bcrypt.compare(password, link.passwordHash))) {
-        return NextResponse.json({ error: 'Password required or incorrect' }, { status: 401 });
-      }
-    }
+    // No password check for E2EE
     // Burn after read or maxViews logic
     let update: any = {};
     // If burnAfterRead is enabled and link has already been accessed, burn it
@@ -45,12 +40,21 @@ export async function GET(req: NextRequest) {
     if (updatedLink && updatedLink.maxViews && updatedLink.clicks === updatedLink.maxViews) {
       shouldBurnAfterResponse = true;
     }
-    // Message-only or redirect
+    // Always return ciphertext, iv, and salt for E2EE
     let response;
-    if (updatedLink && updatedLink.message) {
-      response = NextResponse.json({ message: updatedLink.message, burned: false, clicks: updatedLink.clicks, maxViews: updatedLink.maxViews, analyticsEnabled: updatedLink.analyticsEnabled, expiresAt: updatedLink.expiresAt });
-    } else if (updatedLink && updatedLink.targetUrl) {
-      response = NextResponse.json({ targetUrl: updatedLink.targetUrl, burned: false, clicks: updatedLink.clicks, maxViews: updatedLink.maxViews, analyticsEnabled: updatedLink.analyticsEnabled, expiresAt: updatedLink.expiresAt });
+    if (updatedLink) {
+      response = NextResponse.json({
+        message: updatedLink.message,
+        targetUrl: updatedLink.targetUrl,
+        ivMsg: updatedLink.ivMsg,
+        ivUrl: updatedLink.ivUrl,
+        salt: updatedLink.salt,
+        burned: false,
+        clicks: updatedLink.clicks,
+        maxViews: updatedLink.maxViews,
+        analyticsEnabled: updatedLink.analyticsEnabled,
+        expiresAt: updatedLink.expiresAt
+      });
     } else {
       response = NextResponse.json({ error: 'Invalid link type' }, { status: 400 });
     }

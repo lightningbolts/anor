@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { emberGlow } from "@/utils/styles";
+import { generateKeyFromPassword, encryptString, randomSalt, encodeBase64 } from "@/utils/e2ee";
 
 export default function BurnForm() {
   const [targetUrl, setTargetUrl] = useState("");
@@ -21,21 +22,48 @@ export default function BurnForm() {
     setError("");
     setBurnerUrl("");
     try {
+      // E2EE: generate a random password if not provided
+      let userPassword = password;
+      if (!userPassword) {
+        userPassword = encodeBase64(randomSalt(16));
+      }
+      const salt = randomSalt(16);
+      const key = await generateKeyFromPassword(userPassword, salt);
+      let encryptedTargetUrl = undefined;
+      let encryptedMessage = undefined;
+      let ivUrl = undefined;
+      let ivMsg = undefined;
+      if (targetUrl) {
+        const { ciphertext, iv } = await encryptString(targetUrl, key);
+        encryptedTargetUrl = ciphertext;
+        ivUrl = iv;
+      }
+      if (message) {
+        const { ciphertext, iv } = await encryptString(message, key);
+        encryptedMessage = ciphertext;
+        ivMsg = iv;
+      }
       const res = await fetch("/api/burn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          targetUrl: targetUrl || undefined,
-          message: message || undefined,
-          password: password || undefined,
+          targetUrl: encryptedTargetUrl,
+          message: encryptedMessage,
+          ivUrl,
+          ivMsg,
+          salt: encodeBase64(salt),
           burnAfterSeconds,
           burnAfterRead,
           analyticsEnabled,
         }),
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.url) {
         setBurnerUrl(data.url);
+        // Show password to user if generated
+        if (!password) {
+          setPassword(userPassword);
+        }
       } else {
         setError(data.error || "Error creating burner link");
       }
@@ -144,7 +172,7 @@ export default function BurnForm() {
       </button>
       {burnerUrl && (
         <div className="mt-6 p-4 bg-black bg-opacity-60 rounded text-white text-center">
-          <span className="block mb-2">Burner Link:</span>
+          <span className="block mb-2 font-bold text-amber-300">Burner Link:</span>
           <a
             href={burnerUrl}
             className="font-mono text-lg underline break-all"
@@ -172,6 +200,13 @@ export default function BurnForm() {
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>
+          {password && (
+            <div className="mt-4 p-3 rounded bg-yellow-900 bg-opacity-60 text-yellow-200 text-sm">
+              <span className="block font-bold mb-1">Password:</span>
+              <span className="font-mono break-all">{password}</span>
+              <div className="mt-2 text-yellow-400">Share this password securely with the recipient. <b>Do not send it in the same channel as the link.</b></div>
+            </div>
+          )}
         </div>
       )}
     </form>

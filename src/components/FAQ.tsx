@@ -20,9 +20,23 @@ export default function FAQ() {
         <h3 className="font-bold text-lg mb-1">What happens when a link is burned?</h3>
         <p className="text-gray-200">The link is deleted from the system and cannot be accessed again. You will see a "This link has been burned" message.</p>
       </div>
-      <div>
+      <div className="mb-4">
         <h3 className="font-bold text-lg mb-1">Is my data private?</h3>
-        <p className="text-gray-200">Yes. Burner links are designed for privacy and security. Burner links are stored in MongoDB when not accessed yet, and passwords are encrypted using Bcrypt. Messages and URLs are deleted after burning.</p>
+        <p className="text-gray-200">Yes. Burner links are designed for privacy and security. Burner links are stored in MongoDB when not accessed yet. Messages and URLs are deleted after burning.</p>
+        <br />
+        <p className="text-gray-200">We do not track or log any personal information about users accessing burner links.</p>
+        <br />
+        <p className="text-gray-200">Additionally, Anor is E2EE (end-to-end encrypted) using AES-GCM, ensuring that only you and the intended recipient can access the content. This means that even we cannot read your messages/links. If we tried, we wouldn't be able to; the messages/links in the database stored are random, unintelligible strings of characters. The only ones who can decrypt the content are the sender and the recipient(s).</p>
+        <br />
+        <p className="text-gray-200">However, please note that while we take measures to protect your data, no system is completely immune to vulnerabilities. Always use burner links responsibly.</p>
+      </div>
+      <div className="mb-4">
+        <h3 className="font-bold text-lg mb-1">What about link expiration?</h3>
+        <p className="text-gray-200">Burner links can be set to expire after a certain time or number of views. Once expired, the link is burned and cannot be accessed.</p>
+      </div>
+      <div className="mb-4">
+        <h3 className="font-bold text-lg mb-1">Can I create multiple burner links?</h3>
+        <p className="text-gray-200">Absolutely! You can create as many burner links as you need, each with its own settings and expiration.</p>
       </div>
     </section>
   );
